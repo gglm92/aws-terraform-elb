@@ -1,0 +1,27 @@
+- name: Install service httpd on ec2 machines
+  hosts: tag_type_ec2instance
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Install service httpd
+      yum:
+        name: httpd
+        state: latest
+
+    - name: Start service httpd
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Upgrade index.html
+      template:
+        src: index.html
+        dest: "/var/www/html/index.html"
+        mode: '0755'
+
+    - name: Install stress
+      yum:
+        name: stress
+        state: latest
