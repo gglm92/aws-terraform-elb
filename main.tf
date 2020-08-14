@@ -100,7 +100,7 @@ resource "aws_instance" "web1" {
     type = "ec2instance"
   }
   provisioner "local-exec" {
-    command = "sleep 120; ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user --private-key your_key -i aws_ec2.yaml main.yml"
+    command = "sleep 120; ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user --private-key your_key -i ansible/aws_ec2.yaml ansible/main.yml"
   }
 }
 
