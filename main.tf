@@ -153,6 +153,10 @@ resource "aws_lb" "lb-example" {
   }
 }
 
+output "elb_public_ip" {
+  value = aws_lb.lb-example.dns_name
+}
+
 resource "aws_alb_listener" "lb-example-listener" {  
   load_balancer_arn = aws_lb.lb-example.arn
   port              = "80"
