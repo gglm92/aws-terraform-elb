@@ -1,0 +1,29 @@
+aws_region = "us-east-1"
+aws_access_key = "YOUR_AWS_ACCESS_KEY"
+aws_secret_key = "YOUR_AWS_SECRET_KEY"
+private_key_path = "PATH_OF_YOUR_PRIVATE_KEY"
+
+vpc_cidr_block = "12.0.0.0/16"
+vpc_name = "production"
+
+subnet_1a_cidr_block = "12.0.1.0/24"
+subnet_1a_name = "subnet-us-east-1-1a"
+subnet_1a_az = "us-east-1a"
+
+subnet_1b_cidr_block = "12.0.2.0/24"
+subnet_1b_name = "subnet-us-east-1-1b"
+subnet_1b_az = "us-east-1b"
+
+route_table_name = "route-table-example"
+
+security_group_name = "allow-http-ssh"
+security_group_description = "Allow HTTP and SSH inbound traffic"
+
+instance_ami = "ami-09d8b5222f2b93bf0"
+instance_type = "t2.micro"
+instance_key_name = "YOUR_KEY_NAME"
+instance_tag_type = "ec2instance"
+
+target_group_name = "example-lb-tg"
+
+lb_name = "lb-example"
