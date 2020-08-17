@@ -1,34 +1,34 @@
 # Configure the AWS Provider
 provider "aws" {
   version    = "~> 3.0"
-  region     = "us-east-1"
-  access_key = "your_access_key"
-  secret_key = "your_secret_key"
+  region     = var.aws_region
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
 }
 
 resource "aws_vpc" "vpc_example"{
-  cidr_block           = "12.0.0.0/16"
+  cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = "true"
   tags = {
-    Name = "production"
+    Name = var.vpc_name
   }
 }
 
 resource "aws_subnet" "subnet-us-east-1-1a" {
   vpc_id            = aws_vpc.vpc_example.id
-  cidr_block        = "12.0.1.0/24"
-  availability_zone = "us-east-1a"
+  cidr_block        = var.subnet_1a_cidr_block
+  availability_zone = var.subnet_1a_az
   tags = {
-    Name = "subnet-us-east-1-1a"
+    Name = var.subnet_1a_name
   }
 }
 
 resource "aws_subnet" "subnet-us-east-1-1b" {
   vpc_id            = aws_vpc.vpc_example.id
-  cidr_block        = "12.0.2.0/24"
-  availability_zone = "us-east-1b"
+  cidr_block        = var.subnet_1b_cidr_block
+  availability_zone = var.subnet_1b_az
   tags = {
-    Name = "subnet-us-east-1-1b"
+    Name = var.subnet_1b_name
   }
 }
 
@@ -47,7 +47,7 @@ resource "aws_route_table" "route-table-example"{
     gateway_id      = aws_internet_gateway.igw-example.id
   }
   tags = {
-    Name = "route-table-example"
+    Name = var.route_table_name
   }
 }
 
@@ -57,8 +57,8 @@ resource "aws_main_route_table_association" "route-table-with-vpc" {
 }
 
 resource "aws_security_group" "sg-example" {
-  name        = "allow-http-ssh"
-  description = "Allow HTTP and SSH inbound traffic"
+  name        = var.security_group_name
+  description = var.security_group_description
   vpc_id      = aws_vpc.vpc_example.id
 
   ingress {
@@ -85,42 +85,42 @@ resource "aws_security_group" "sg-example" {
   }
 
   tags = {
-    Name = "allow-http-ssh"
+    Name = var.security_group_name
   }
 }
 
 resource "aws_instance" "web1" {
-  ami                         = "ami-09d8b5222f2b93bf0"
-  instance_type               = "t2.micro"
+  ami                         = var.instance_ami
+  instance_type               = var.instance_type
   associate_public_ip_address = "true"
   subnet_id                   = aws_subnet.subnet-us-east-1-1a.id
   vpc_security_group_ids      = [aws_security_group.sg-example.id]
-  key_name                    = "your_key_name"
+  key_name                    = var.instance_key_name
   tags = {
-    type = "ec2instance"
+    type = var.instance_tag_type
   }
   provisioner "local-exec" {
-    command = "sleep 120; ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user --private-key your_key -i ansible/aws_ec2.yaml ansible/main.yml"
+    command = "sleep 120; ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user --private-key '${var.private_key_path}' -i ansible/aws_ec2.yaml ansible/main.yml"
   }
 }
 
 resource "aws_instance" "web2" {
-  ami                         = "ami-09d8b5222f2b93bf0"
-  instance_type               = "t2.micro"
+  ami                         = var.instance_ami
+  instance_type               = var.instance_type
   associate_public_ip_address = "true"
   subnet_id                   = aws_subnet.subnet-us-east-1-1b.id
   vpc_security_group_ids      = [aws_security_group.sg-example.id]
-  key_name                    = "your_key_name"
+  key_name                    = var.instance_key_name
   tags = {
-    type = "ec2instance"
+    type = var.instance_tag_type
   }
   provisioner "local-exec" {
-    command = "sleep 120; ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user --private-key your_key -i ansible/aws_ec2.yaml ansible/main.yml"
+    command = "sleep 120; ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user --private-key '${var.private_key_path}' -i ansible/aws_ec2.yaml ansible/main.yml"
   }
 }
 
 resource "aws_lb_target_group" "target-group-example" {
-  name     = "example-lb-tg"
+  name     = var.target_group_name
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc_example.id
@@ -139,7 +139,7 @@ resource "aws_lb_target_group_attachment" "lb-tg-web2" {
 }
 
 resource "aws_lb" "lb-example" {
-  name               = "lb-example"
+  name               = var.lb_name
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg-example.id]
@@ -149,7 +149,7 @@ resource "aws_lb" "lb-example" {
   ]
 
   tags = {
-    Name = "lb-example"
+    Name = var.lb_name
   }
 }
 
